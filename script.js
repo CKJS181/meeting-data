@@ -13,7 +13,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 // 🔹 Load district-to-subdistrict mapping from GitHub raw link
-fetch('https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY/main/mapping.csv')
+fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/mapping.csv')
     .then(response => response.text())
     .then(data => {
         console.log("Raw CSV Data Loaded:", data); // ✅ Debugging: Check if CSV is fetched
