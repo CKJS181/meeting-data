@@ -1,4 +1,4 @@
-// 🔹 Add your Firebase configuration here
+// 🔹 Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyAAVQrb6L0eqnwQBaf0l0W7knCs7POMe7I",
     authDomain: "meetingtracker-b702b.firebaseapp.com",
@@ -12,27 +12,24 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 🔹 Load district-to-subdistrict mapping from GitHub raw link
-fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/mapping.csv')
-    .then(response => response.text())
+// 🔹 Fetch District-to-Subdistrict Mapping from JSON
+fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/mapping.json')
+    .then(response => response.json())
     .then(data => {
-        console.log("Raw CSV Data Loaded:", data); // ✅ Debugging: Check if CSV is fetched
+        console.log("JSON Loaded Successfully:", data); // ✅ Debugging: See if JSON loads
 
-        const lines = data.split("\n");
-        let mapping = {}; // Initialize mapping object
-
-        lines.forEach(line => {
-            const parts = line.trim().split(",");
-            if (parts.length === 2) {
-                const [district, subDistrict] = parts;
-                if (!mapping[district]) mapping[district] = [];
-                mapping[district].push(subDistrict);
+        // Convert JSON into District -> Blocks format
+        let mapping = {};
+        data.forEach(item => {
+            if (!mapping[item.District]) {
+                mapping[item.District] = [];
             }
+            mapping[item.District].push(item.Blocks);
         });
 
-        console.log("Processed Mapping:", mapping); // ✅ Debugging: Check if mapping is correct
+        console.log("Processed Mapping:", mapping); // ✅ Debugging: Check if mapping works
 
-        // Populate district dropdown
+        // Populate District Dropdown
         const districtDropdown = document.getElementById("district");
         Object.keys(mapping).forEach(district => {
             const option = document.createElement("option");
@@ -41,7 +38,7 @@ fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/mapping.csv')
             districtDropdown.appendChild(option);
         });
 
-        // Handle district change event to update sub-districts
+        // When District Changes, Update Sub-Districts
         districtDropdown.addEventListener("change", function () {
             const selectedDistrict = this.value;
             const subDistrictDropdown = document.getElementById("sub-district");
@@ -57,9 +54,9 @@ fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/mapping.csv')
             }
         });
     })
-    .catch(error => console.error("Error fetching CSV:", error)); // ✅ Debugging: Check for errors
+    .catch(error => console.error("Error fetching JSON:", error)); // ✅ Debugging: Check for errors
 
-// 🔹 Handle form submission
+// 🔹 Handle Form Submission
 document.getElementById("meeting-form").addEventListener("submit", function (e) {
     e.preventDefault();
 
@@ -77,14 +74,14 @@ document.getElementById("meeting-form").addEventListener("submit", function (e) 
         status: "Scheduled"
     };
 
-    // 🔹 Save data to Firebase Firestore
+    // Save to Firebase
     db.collection("meetings").add(meetingData).then(() => {
         alert("Meeting recorded!");
         document.getElementById("meeting-form").reset();
-    }).catch(error => console.error("Error saving data:", error)); // ✅ Debugging: Check for errors
+    }).catch(error => console.error("Error saving data:", error));
 });
 
-// 🔹 Function to download meeting data as CSV
+// 🔹 Function to Download Meeting Data as CSV
 function downloadCSV() {
     db.collection("meetings").get().then(snapshot => {
         let csv = "JSID,District,Sub-District,Panchayat,Village,Date,Time,Host Name,Host Number,Speaker Names,Status\n";
@@ -94,11 +91,11 @@ function downloadCSV() {
             csv += `${data.jsid},${data.district},${data.subDistrict},${data.panchayat},${data.village},${data.date},${data.time},${data.hostName},${data.hostNumber},${data.speakerNames},${data.status}\n`;
         });
 
-        // Create CSV file and trigger download
+        // Create CSV File and Download
         const blob = new Blob([csv], { type: 'text/csv' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         link.download = "meetings.csv";
         link.click();
-    }).catch(error => console.error("Error fetching data:", error)); // ✅ Debugging: Check for errors
+    }).catch(error => console.error("Error fetching data:", error));
 }
