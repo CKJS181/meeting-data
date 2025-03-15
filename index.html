@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Data Entry</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Meeting Data Entry</h1>
+    
+    <form id="meeting-form">
+        <label>JSID: <input type="text" id="jsid" required></label><br>
+        
+        <label>District: 
+            <select id="district" required>
+                <option value="">Select District</option>
+            </select>
+        </label><br>
+        
+        <label>Sub-District:
+            <select id="sub-district" required>
+                <option value="">Select Sub-District</option>
+            </select>
+        </label><br>
+
+        <label>Panchayat: <input type="text" id="panchayat" required></label><br>
+        <label>Village: <input type="text" id="village" required></label><br>
+        <label>Meeting Date: <input type="date" id="meeting-date" required></label><br>
+        <label>Meeting Time: <input type="time" id="meeting-time" required></label><br>
+        <label>Host Name: <input type="text" id="host-name" required></label><br>
+        <label>Host Number: <input type="text" id="host-number" required></label><br>
+        <label>Speaker Names: <input type="text" id="speaker-names" required></label><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <h2>Your Meetings for Today</h2>
+    <div id="meetings"></div>
+
+    <button onclick="downloadCSV()">Download Data</button>
+
+    <script src="script.js"></script>
+</body>
+</html>
