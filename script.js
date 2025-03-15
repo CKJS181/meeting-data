@@ -12,19 +12,20 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// 🔹 Fetch District-to-Subdistrict Mapping from JSON
-fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/mapping.json')
+// 🔹 Fetch District-to-Block Mapping from JSON
+fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/converted_mapping.json')
     .then(response => response.json())
     .then(data => {
         console.log("JSON Loaded Successfully:", data); // ✅ Debugging: See if JSON loads
 
-        // Convert JSON into District -> Blocks format
         let mapping = {};
+
+        // Convert JSON into District -> Blocks format
         data.forEach(item => {
             if (!mapping[item.District]) {
                 mapping[item.District] = [];
             }
-            mapping[item.District].push(item.Blocks);
+            mapping[item.District] = item.Blocks; // Ensure "Blocks" is a list
         });
 
         console.log("Processed Mapping:", mapping); // ✅ Debugging: Check if mapping works
@@ -38,18 +39,18 @@ fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/mapping.json'
             districtDropdown.appendChild(option);
         });
 
-        // When District Changes, Update Sub-Districts
+        // When District Changes, Update Blocks
         districtDropdown.addEventListener("change", function () {
             const selectedDistrict = this.value;
-            const subDistrictDropdown = document.getElementById("sub-district");
-            subDistrictDropdown.innerHTML = '<option value="">Select Sub-District</option>';
+            const blockDropdown = document.getElementById("sub-district");
+            blockDropdown.innerHTML = '<option value="">Select Block</option>';
 
             if (mapping[selectedDistrict]) {
-                mapping[selectedDistrict].forEach(sub => {
+                mapping[selectedDistrict].forEach(block => {
                     const option = document.createElement("option");
-                    option.value = sub;
-                    option.textContent = sub;
-                    subDistrictDropdown.appendChild(option);
+                    option.value = block;
+                    option.textContent = block;
+                    blockDropdown.appendChild(option);
                 });
             }
         });
@@ -84,7 +85,7 @@ document.getElementById("meeting-form").addEventListener("submit", function (e) 
 // 🔹 Function to Download Meeting Data as CSV
 function downloadCSV() {
     db.collection("meetings").get().then(snapshot => {
-        let csv = "JSID,District,Sub-District,Panchayat,Village,Date,Time,Host Name,Host Number,Speaker Names,Status\n";
+        let csv = "JSID,District,Block,Panchayat,Village,Date,Time,Host Name,Host Number,Speaker Names,Status\n";
 
         snapshot.forEach(doc => {
             const data = doc.data();
