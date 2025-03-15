@@ -16,37 +16,38 @@ const db = firebase.firestore();
 fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/converted_mapping.json')
     .then(response => response.json())
     .then(data => {
-        console.log("JSON Loaded Successfully:", data); // ✅ Debugging: See if JSON loads
+        console.log("✅ JSON Loaded:", data);
 
         let mapping = {};
 
-        // Convert JSON into District -> Blocks format
         data.forEach(item => {
+            console.log("Processing District:", item.District, "Blocks:", item.Blocks);
             if (!mapping[item.District]) {
                 mapping[item.District] = [];
             }
-            mapping[item.District] = item.Blocks; // Ensure "Blocks" is a list
+            mapping[item.District] = item.Blocks;
         });
 
-        console.log("Processed Mapping:", mapping); // ✅ Debugging: Check if mapping works
+        console.log("Final Processed Mapping:", mapping);
 
-        // Populate District Dropdown
         const districtDropdown = document.getElementById("district");
         Object.keys(mapping).forEach(district => {
+            console.log("✅ Adding District to Dropdown:", district);
             const option = document.createElement("option");
             option.value = district;
             option.textContent = district;
             districtDropdown.appendChild(option);
         });
 
-        // When District Changes, Update Blocks
         districtDropdown.addEventListener("change", function () {
             const selectedDistrict = this.value;
+            console.log("➡️ Selected District:", selectedDistrict);
             const blockDropdown = document.getElementById("sub-district");
             blockDropdown.innerHTML = '<option value="">Select Block</option>';
 
             if (mapping[selectedDistrict]) {
                 mapping[selectedDistrict].forEach(block => {
+                    console.log("✅ Adding Block to Dropdown:", block);
                     const option = document.createElement("option");
                     option.value = block;
                     option.textContent = block;
@@ -55,7 +56,7 @@ fetch('https://raw.githubusercontent.com/CKJS181/meeting-data/main/converted_map
             }
         });
     })
-    .catch(error => console.error("Error fetching JSON:", error)); // ✅ Debugging: Check for errors
+    .catch(error => console.error("❌ Error fetching JSON:", error));
 
 // 🔹 Handle Form Submission
 document.getElementById("meeting-form").addEventListener("submit", function (e) {
